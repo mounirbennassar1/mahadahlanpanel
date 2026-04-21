@@ -1,36 +1,93 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Mahadahlan Lead Panel
 
-## Getting Started
+Centralised lead-management dashboard that ingests form submissions from every Mahadahlan landing page (hair, hydrafacial, botox, fillers, laser, …) and lets the sales team triage, assign, and report on them from one place.
 
-First, run the development server:
+- **Stack:** Next.js 16 (App Router), React 19, Tailwind v4, Prisma 6 + PostgreSQL (Neon), NextAuth.js v5 (credentials, JWT sessions)
+- **Design:** Implemented from the Claude Design handoff in `_design/` — light lavender theme, Plus Jakarta Sans + Inter + Fraunces, purple primary
+
+## 1. First-time setup
 
 ```bash
+npm install
+cp .env.example .env.local
+# fill in DATABASE_URL, DIRECT_DATABASE_URL, AUTH_SECRET (openssl rand -base64 32), ADMIN_EMAIL, ADMIN_PASSWORD
+npm run db:push          # push the schema to Postgres
+npm run db:seed          # create admin + team + sources + 180 demo leads
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The seed prints each source's generated API key — copy them, they are not stored in plaintext.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 2. Landing-page integration
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Each landing page POSTs to the panel's ingest endpoint with its own API key:
 
-## Learn More
+```ts
+await fetch("https://panel.mahadahlan.com/api/leads", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "x-api-key": process.env.LEAD_API_KEY,
+  },
+  body: JSON.stringify({
+    fullName: "Fatima Al-Zahra",
+    phone: "+966 50 128 4471",
+    city: "Riyadh",
+  }),
+});
+```
 
-To learn more about Next.js, take a look at the following resources:
+- The `source` is derived from the API key — landing pages cannot spoof each other.
+- CORS is restricted to origins listed in `LANDING_ORIGINS` (comma-separated).
+- `POST` only; the handler also answers `OPTIONS` for preflight.
+- Keys can be rotated from `/dashboard/sources` (admin only).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 3. What's in the dashboard
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Route | Purpose |
+| --- | --- |
+| `/login` | Credentials sign-in (NextAuth v5, JWT sessions) |
+| `/dashboard` | KPI cards (total, this week, confirmed, booked, cancelled, conversion rate) + 5 charts: leads over time, status donut, leads by city, team performance, conversion funnel |
+| `/dashboard/leads` | Full leads table with source filter, status filter, search, status pill, assignee pill, pagination |
+| `/dashboard/sources` | List of landing-page sources, lead count per source, key hints, rotate key |
+| `/dashboard/team` | Team members + assigned-lead counts |
+| `/dashboard/settings` | Session info + integration snippet |
 
-## Deploy on Vercel
+## 4. File map
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+app/
+├── api/
+│   ├── auth/[...nextauth]/route.ts   # NextAuth route handler
+│   └── leads/route.ts                 # Public ingest (x-api-key, CORS, zod)
+├── dashboard/
+│   ├── layout.tsx                     # Sidebar + topbar + auth gate
+│   ├── page.tsx                       # KPI + charts home
+│   ├── leads/*                        # Table + filters + status/assignee updates
+│   ├── sources/*                      # Source list + key rotation (admin)
+│   ├── team/page.tsx
+│   └── settings/page.tsx
+├── login/*
+└── layout.tsx / globals.css           # Fonts + design tokens
+auth.ts                                # NextAuth config (credentials + JWT)
+proxy.ts                               # Next.js 16 middleware (renamed "Proxy")
+lib/
+├── prisma.ts
+├── api-key.ts                         # sha256 hashing, mdp_<slug>_<random> format
+├── metrics.ts                         # KPI + chart aggregations
+└── status.ts                          # Status metadata + relative dates
+prisma/
+├── schema.prisma                      # User / LeadSource / Lead
+└── seed.ts                            # Admin + team + sources (prints keys) + demo leads
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 5. Next.js 16 notes (from `node_modules/next/dist/docs/`)
+
+- Middleware is now **Proxy** (`proxy.ts`, not `middleware.ts`).
+- `cookies()`, `headers()`, `params`, `searchParams` are all Promises — always `await` them.
+- `PageProps<'/path'>` and `LayoutProps<'/path'>` are global helpers generated by `next dev`/`next build`.
+- Route Handlers are dynamic by default — no `export const dynamic` needed for `POST`.
+
+## 6. Deploy
+
+On Vercel, set the same env vars. Link a Neon database and use its pooled URL for `DATABASE_URL` and the direct URL for `DIRECT_DATABASE_URL` (Prisma migrations need the direct URL). Run `npm run db:push && npm run db:seed` once after the first deploy (from the Vercel CLI or a deploy hook).

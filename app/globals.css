@@ -1,26 +1,94 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: oklch(0.985 0.006 300);
+  --bg-tint: oklch(0.975 0.012 300);
+  --surface: #ffffff;
+  --surface-2: oklch(0.985 0.008 300);
+  --border: oklch(0.92 0.018 295);
+  --border-strong: oklch(0.86 0.028 295);
+  --hairline: oklch(0.94 0.012 295);
+
+  --ink: oklch(0.22 0.025 295);
+  --ink-2: oklch(0.36 0.022 295);
+  --ink-3: oklch(0.54 0.02 295);
+  --ink-4: oklch(0.68 0.018 295);
+
+  --primary: oklch(0.46 0.16 295);
+  --primary-2: oklch(0.56 0.16 295);
+  --primary-3: oklch(0.72 0.14 295);
+  --primary-4: oklch(0.85 0.08 295);
+  --primary-soft: oklch(0.95 0.03 295);
+  --primary-softer: oklch(0.975 0.018 295);
+
+  --amber: oklch(0.72 0.14 75);
+  --amber-soft: oklch(0.96 0.04 80);
+  --green: oklch(0.62 0.13 155);
+  --green-soft: oklch(0.96 0.035 155);
+  --blue: oklch(0.58 0.13 240);
+  --blue-soft: oklch(0.96 0.03 240);
+  --red: oklch(0.6 0.17 25);
+  --red-soft: oklch(0.96 0.03 25);
+  --slate: oklch(0.58 0.012 295);
+  --slate-soft: oklch(0.955 0.01 295);
+  --notint-bg: oklch(0.94 0.025 25);
+  --notint-fg: oklch(0.48 0.08 25);
+  --notint-dot: oklch(0.55 0.09 25);
+
+  --radius: 16px;
+  --radius-sm: 10px;
+  --radius-xs: 8px;
+  --shadow-sm: 0 1px 2px oklch(0.3 0.05 295 / 0.04), 0 1px 1px oklch(0.3 0.05 295 / 0.03);
+  --shadow: 0 2px 4px oklch(0.3 0.05 295 / 0.04), 0 8px 24px oklch(0.3 0.05 295 / 0.06);
+  --shadow-lg: 0 12px 40px oklch(0.3 0.05 295 / 0.10);
+
+  --sidebar-w: 248px;
+  --sidebar-w-collapsed: 76px;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-hairline: var(--hairline);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-ink-4: var(--ink-4);
+  --color-primary: var(--primary);
+  --color-primary-2: var(--primary-2);
+  --color-primary-soft: var(--primary-soft);
+  --color-primary-softer: var(--primary-softer);
+  --font-ui: var(--font-jakarta), system-ui, sans-serif;
+  --font-data: var(--font-inter), system-ui, sans-serif;
+  --font-display: var(--font-jakarta), system-ui, sans-serif;
+  --font-accent: var(--font-fraunces), serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-jakarta), system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
 }
+
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+a { color: inherit; text-decoration: none; }
+
+/* Status pill colors */
+.s-inquiry { background: var(--blue-soft); color: var(--blue); }
+.s-inquiry .dot { background: var(--blue); }
+.s-confirmed { background: var(--amber-soft); color: var(--amber); }
+.s-confirmed .dot { background: var(--amber); }
+.s-booked { background: var(--green-soft); color: var(--green); }
+.s-booked .dot { background: var(--green); }
+.s-cancelled { background: var(--red-soft); color: var(--red); }
+.s-cancelled .dot { background: var(--red); }
+.s-noanswer { background: var(--slate-soft); color: var(--slate); }
+.s-noanswer .dot { background: var(--slate); }
+.s-notint { background: var(--notint-bg); color: var(--notint-fg); }
+.s-notint .dot { background: var(--notint-dot); }
