@@ -20,8 +20,9 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  title: "Mahadahlan — Lead Management",
-  description: "Centralised lead management for Mahadahlan landing pages.",
+  title: "MD Clinics — Lead Management",
+  description: "Centralised lead management for MD Clinics landing pages.",
+  icons: { icon: "/logo.png" },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

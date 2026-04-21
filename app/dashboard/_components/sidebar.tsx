@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { Session } from "next-auth";
@@ -121,34 +122,15 @@ export function Sidebar({
         overflow: "hidden",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "22px 22px 20px" }}>
-        <div
-          style={{
-            width: 36,
-            height: 36,
-            flex: "none",
-            borderRadius: 10,
-            background: "linear-gradient(145deg, var(--primary) 0%, var(--primary-2) 100%)",
-            display: "grid",
-            placeItems: "center",
-            color: "#fff",
-            fontFamily: "var(--font-display)",
-            fontWeight: 700,
-            fontSize: 16,
-            letterSpacing: "-0.02em",
-            boxShadow: "0 6px 14px oklch(0.46 0.16 295 / 0.28)",
-          }}
-        >
-          M
-        </div>
-        <div style={{ lineHeight: 1.1 }}>
-          <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 16, letterSpacing: "-0.02em" }}>
-            Mahadahlan
-          </div>
-          <div style={{ fontSize: 11, color: "var(--ink-3)", fontWeight: 500, letterSpacing: "0.02em", marginTop: 2 }}>
-            Lead Studio
-          </div>
-        </div>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "22px 22px 20px" }}>
+        <Image
+          src="/logo.png"
+          alt="MD Clinics"
+          width={140}
+          height={140}
+          priority
+          style={{ width: "auto", height: 80, objectFit: "contain" }}
+        />
       </div>
 
       <NavSection label="Overview" items={OVERVIEW_NAV} pathname={pathname} />
