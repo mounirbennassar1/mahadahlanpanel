@@ -5,12 +5,17 @@ import "dotenv/config";
 
 const prisma = new PrismaClient();
 
+// Slugs match the route segments under app/(landings)/<slug>/ in the
+// landingpages project. The slug is what each landing sends as `source`,
+// and what we render in the dashboard filters.
 const SOURCES = [
-  { slug: "hair", label: "Hair Transplant" },
-  { slug: "hydrafacial", label: "HydraFacial" },
-  { slug: "botox", label: "Botox" },
-  { slug: "fillers", label: "Dermal Fillers" },
-  { slug: "laser", label: "Laser Hair Removal" },
+  { slug: "hair", label: "علاج تساقط الشعر" },
+  { slug: "botox", label: "البوتوكس والفيلر" },
+  { slug: "hyperpigmentation", label: "علاج التصبّغات" },
+  { slug: "dark-circles", label: "علاج الهالات حول العين" },
+  { slug: "acne", label: "علاج حب الشباب" },
+  { slug: "facial", label: "العناية بالبشرة والهايدرافيشل" },
+  { slug: "stretchmarks", label: "علاج التشققات وعلامات التمدد" },
 ];
 
 const TEAM = [
